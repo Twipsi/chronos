@@ -82,13 +82,8 @@ class Chronos
      */
     public static function date(string|DateTime|int $date = null): Chronos
     {
-        // If its already a datetime save it.
-        if ($date instanceof DateTime) {
-            $date = $date;
-        }
-
         // If its a string date or null create a new datetime.
-        elseif (is_string($date) || is_null($date)) {
+        if (is_string($date) || is_null($date)) {
             $date = new DateTime($date ?? "");
         }
 

@@ -89,8 +89,7 @@ class Chronos
 
         // if date is a timestamp convert it.
         elseif (is_int($stamp = $date)) {
-            $date = new DateTime();
-            $date->setTimestamp($stamp);
+            $date = (new DateTime)->setTimestamp($stamp);
         }
 
         return new self($date);

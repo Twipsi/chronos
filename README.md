@@ -1,6 +1,11 @@
 # Chronos
  Simple class to play with time
 
+ ## Install
+ ```
+ composer require twipsi/chronos
+ ```
+
 ## Initializing the class
 
  You can set the initial date as a DateTime object or a Chronos instance or a valid date string or a timestamp.

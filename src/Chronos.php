@@ -19,7 +19,7 @@ use DateInterval;
 use InvalidArgumentException;
 use RuntimeException;
 
-class Chronos
+final class Chronos
 {
     /**
      * Initial DateTime.
@@ -66,32 +66,37 @@ class Chronos
     /**
      * Construct Chronos.
      *
-     * @param DateTime|null $date
+     * @param Chronos|DateTime|int|string
      */
-    public function __construct(DateTime|null $date)
+    public function __construct(Chronos|DateTime|int|string $date = null)
     {
-        $this->date = $date;
+        // If its a string date or null create a new datetime.
+        if (is_string($date) || is_null($date)) {
+            $this->date = new DateTime($date ?? "");
+        }
+        
+        // If date is a timestamp convert it.
+        else if (is_int($date)) {
+            $this->date = (new DateTime)->setTimestamp($date);
+         }
+        
+         // If its a DateTime or Chronos
+        else {
+            $this->date = $date instanceof Chronos 
+            ? $date->getDateObject() 
+            : $date;
+        }
     }
 
     /**
      * Initialize Chronos object staticly.
      *
-     * @param string|DateTime|int|null $date
+     * @param Chronos|DateTime|int|string $date
      *
      * @return Chronos
      */
-    public static function date(string|DateTime|int $date = null): Chronos
+    public static function date(Chronos|DateTime|int|string $date = null): Chronos
     {
-        // If its a string date or null create a new datetime.
-        if (is_string($date) || is_null($date)) {
-            $date = new DateTime($date ?? "");
-        }
-
-        // if date is a timestamp convert it.
-        elseif (is_int($stamp = $date)) {
-            $date = (new DateTime)->setTimestamp($stamp);
-        }
-
         return new self($date);
     }
 
@@ -408,32 +413,39 @@ class Chronos
      * Set an endpoint to the initial date to compare.
      * Ex. Chronos::date()->travel('2021-01-03 17:13:00')->daysPassed();
      *
-     * @param DateTime|string|int|null $date
+     * @param Chronos|DateTime|string|int|null $date
      *
      * @return Chronos
      */
-    public function travel(DateTime|string|int|null $date): Chronos
+    public function travel(Chronos|DateTime|string|int|null $date): Chronos
     {
         // If its already a datetime save it.
         if ($date instanceof DateTime) {
-            $past = $date;
+            $travel = $date;
         }
 
         // If its a string date or null create a new datetime.
         elseif (is_string($date) || is_null($date)) {
-            $past = new DateTime($date ?? "");
+            $travel = new DateTime($date ?? "");
         }
 
-        // if date is a timestamp convert it.
+        // If date is a timestamp convert it.
+        elseif(is_int($date)) {
+            $travel = (new DateTime())
+                ->setTimestamp($date);
+        }
+
+        // If its Chronos or DateTime
         else {
-            $past = new DateTime();
-            $past->setTimestamp($date);
+            $travel = $date instanceof Chronos 
+                ? $date->getDateObject() 
+                : $date;
         }
 
-        $past->format($this->dateTimeFormat);
-        $past->setTimezone(new DateTimeZone($this->timezone));
+        $travel->format($this->dateTimeFormat);
+        $travel->setTimezone(new DateTimeZone($this->timezone));
 
-        $this->travel = $past->diff($this->date);
+        $this->travel = $travel->diff($this->date);
 
         return $this;
     }

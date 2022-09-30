@@ -3,12 +3,15 @@
 
 ## Initializing the class
 
- You can set the initial date as a DateTime object or a valid date string or a timestamp.
+ You can set the initial date as a DateTime object or a Chronos instance or a valid date string or a timestamp.
 
  ```php
+ Chronos::date(new Chronos)...
  Chronos::date(new DateTime)...
  Chronos::date('2022-05-05 10:10:10')...
  Chronos::date(1664524279)...
+
+ new Chronos(new DateTime)
  ```
 
  Or just get the current datetime.

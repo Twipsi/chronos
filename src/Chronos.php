@@ -54,7 +54,7 @@ final class Chronos
      *
      * @var string
      */
-    protected string $timezone = "UTC";
+    protected string $timezone = "GMT";
 
     /**
      * Second date to compare.
@@ -74,16 +74,16 @@ final class Chronos
         if (is_string($date) || is_null($date)) {
             $this->date = new DateTime($date ?? "");
         }
-        
+
         // If date is a timestamp convert it.
         else if (is_int($date)) {
             $this->date = (new DateTime)->setTimestamp($date);
          }
-        
+
          // If its a DateTime or Chronos
         else {
-            $this->date = $date instanceof Chronos 
-            ? $date->getDateObject() 
+            $this->date = $date instanceof Chronos
+            ? $date->getDateObject()
             : $date;
         }
     }
@@ -159,6 +159,7 @@ final class Chronos
             );
         }
 
+        $this->timezone = $timezone;
         $this->date->setTimezone($zone);
 
         return $this;
@@ -437,8 +438,8 @@ final class Chronos
 
         // If its Chronos or DateTime
         else {
-            $travel = $date instanceof Chronos 
-                ? $date->getDateObject() 
+            $travel = $date instanceof Chronos
+                ? $date->getDateObject()
                 : $date;
         }
 

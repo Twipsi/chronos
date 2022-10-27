@@ -54,7 +54,7 @@ final class Chronos
      *
      * @var string
      */
-    protected string $timezone = "GMT";
+    protected string $timezone = "Europe/Budapest";
 
     /**
      * Second date to compare.

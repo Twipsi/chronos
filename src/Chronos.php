@@ -16,6 +16,7 @@ namespace Twipsi\Chronos;
 use Datetime;
 use DateTimeZone;
 use DateInterval;
+use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -66,11 +67,12 @@ final class Chronos
     /**
      * Construct Chronos.
      *
-     * @param Chronos|DateTime|int|string
+     * @param Chronos|Datetime|int|string|null $date
+     * @throws Exception
      */
     public function __construct(Chronos|DateTime|int|string $date = null)
     {
-        // If its a string date or null create a new datetime.
+        // If it's a string date or null create a new datetime.
         if (is_string($date) || is_null($date)) {
             $this->date = new DateTime($date ?? "");
         }
@@ -80,7 +82,7 @@ final class Chronos
             $this->date = (new DateTime)->setTimestamp($date);
          }
 
-         // If its a DateTime or Chronos
+         // If it's a DateTime or Chronos
         else {
             $this->date = $date instanceof Chronos
             ? $date->getDateObject()
@@ -89,10 +91,9 @@ final class Chronos
     }
 
     /**
-     * Initialize Chronos object staticly.
+     * Initialize Chronos object statically.
      *
-     * @param Chronos|DateTime|int|string $date
-     *
+     * @param Chronos|Datetime|int|string|null $date
      * @return Chronos
      */
     public static function date(Chronos|DateTime|int|string $date = null): Chronos
@@ -104,7 +105,6 @@ final class Chronos
      * Set the default datetime format.
      *
      * @param string $format
-     *
      * @return Chronos
      */
     public function setDateTimeFormat(string $format): Chronos
@@ -118,7 +118,6 @@ final class Chronos
      * Set the default date format.
      *
      * @param string $format
-     *
      * @return Chronos
      */
     public function setDateFormat(string $format): Chronos
@@ -132,7 +131,6 @@ final class Chronos
      * Set the default time format.
      *
      * @param string $format
-     *
      * @return Chronos
      */
     public function setTimeFormat(string $format): Chronos
@@ -146,14 +144,15 @@ final class Chronos
      * Set the default timezone.
      *
      * @param string $timezone
-     *
      * @return Chronos
-     *
      * @throws InvalidArgumentException
      */
     public function setTimezone(string $timezone): Chronos
     {
-        if (! $zone = new DateTimeZone($timezone)) {
+        try {
+            $zone = new DateTimeZone($timezone);
+
+        } catch(Exception) {
             throw new InvalidArgumentException(
                 sprintf("The requested timezone [%s] is not supported", $timezone)
             );
@@ -329,9 +328,8 @@ final class Chronos
      * Add Days to currently set date.
      *
      * @param int $days
-     *
      * @return Chronos
-     * @throws \Exception
+     * @throws Exception
      */
     public function addDays(int $days): Chronos
     {
@@ -344,8 +342,8 @@ final class Chronos
      * Add Minutes to currently set date.
      *
      * @param int $minutes
-     *
      * @return Chronos
+     * @throws Exception
      */
     public function addMinutes(int $minutes): Chronos
     {
@@ -358,8 +356,8 @@ final class Chronos
      * Add Seconds to currently set date.
      *
      * @param int $seconds
-     *
      * @return Chronos
+     * @throws Exception
      */
     public function addSeconds(int $seconds): Chronos
     {
@@ -372,8 +370,8 @@ final class Chronos
      * Subtract Days to currently set date.
      *
      * @param int $days
-     *
      * @return Chronos
+     * @throws Exception
      */
     public function subDays(int $days): Chronos
     {
@@ -386,8 +384,8 @@ final class Chronos
      * Subtract Minutes to currently set date.
      *
      * @param int $minutes
-     *
      * @return Chronos
+     * @throws Exception
      */
     public function subMinutes(int $minutes): Chronos
     {
@@ -400,8 +398,8 @@ final class Chronos
      * Subtract Seconds to currently set date.
      *
      * @param int $seconds
-     *
      * @return Chronos
+     * @throws Exception
      */
     public function subSeconds(int $seconds): Chronos
     {
@@ -415,17 +413,17 @@ final class Chronos
      * Ex. Chronos::date()->travel('2021-01-03 17:13:00')->daysPassed();
      *
      * @param Chronos|DateTime|string|int|null $date
-     *
      * @return Chronos
+     * @throws Exception
      */
     public function travel(Chronos|DateTime|string|int|null $date): Chronos
     {
-        // If its already a datetime save it.
+        // If it's already a datetime save it.
         if ($date instanceof DateTime) {
             $travel = $date;
         }
 
-        // If its a string date or null create a new datetime.
+        // If it's a string date or null create a new datetime.
         elseif (is_string($date) || is_null($date)) {
             $travel = new DateTime($date ?? "");
         }
@@ -438,14 +436,10 @@ final class Chronos
 
         // If its Chronos or DateTime
         else {
-            $travel = $date instanceof Chronos
-                ? $date->getDateObject()
-                : $date;
+            $travel = $date->getDateObject();
         }
 
-        $travel->format($this->dateTimeFormat);
         $travel->setTimezone(new DateTimeZone($this->timezone));
-
         $this->travel = $travel->diff($this->date);
 
         return $this;
@@ -456,7 +450,6 @@ final class Chronos
      * This will return 0 if travel date is in the future.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function daysPassed(): int
@@ -473,7 +466,6 @@ final class Chronos
      * This will return negative days if travel is in the past.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function differenceInDays(): int
@@ -489,7 +481,6 @@ final class Chronos
      * Get hours passed between 2 date endpoints.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function hoursPassed(): int
@@ -506,7 +497,6 @@ final class Chronos
      * This will return negative days if travel is in the past.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function differenceInHours(): int
@@ -522,7 +512,6 @@ final class Chronos
      * Get minutes passed between 2 date endpoints.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function minutesPassed(): int
@@ -539,7 +528,6 @@ final class Chronos
      * This will return negative days if travel is in the past.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function differenceInMinutes(): int
@@ -555,7 +543,6 @@ final class Chronos
      * Get seconds passed between 2 date endpoints.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function secondsPassed(): int
@@ -572,7 +559,6 @@ final class Chronos
      * This will return negative days if travel is in the past.
      *
      * @return int
-     *
      * @throws RuntimeException
      */
     public function differenceInSeconds(): int
@@ -608,7 +594,6 @@ final class Chronos
      * Check if we have a travel date before continuing.
      *
      * @return void
-     *
      * @throws RuntimeException
      */
     protected function ensureTravelDateIsSet(): void

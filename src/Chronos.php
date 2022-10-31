@@ -55,7 +55,7 @@ final class Chronos
      *
      * @var string
      */
-    protected string $timezone = "Europe/Budapest";
+    protected static string $timezone = "Europe/Budapest";
 
     /**
      * Second date to compare.
@@ -158,10 +158,30 @@ final class Chronos
             );
         }
 
-        $this->timezone = $timezone;
+        Chronos::$timezone = $timezone;
         $this->date->setTimezone($zone);
 
         return $this;
+    }
+
+    /**
+     * Set the default timezone statically.
+     *
+     * @param string $timezone
+     * @return void
+     */
+    public static function setChronosTimezone(string $timezone): void
+    {
+        try {
+            $zone = new DateTimeZone($timezone);
+
+        } catch(Exception) {
+            throw new InvalidArgumentException(
+                sprintf("The requested timezone [%s] is not supported", $timezone)
+            );
+        }
+
+        Chronos::$timezone = $timezone;
     }
 
     /**
@@ -439,7 +459,7 @@ final class Chronos
             $travel = $date->getDateObject();
         }
 
-        $travel->setTimezone(new DateTimeZone($this->timezone));
+        $travel->setTimezone(new DateTimeZone(Chronos::$timezone));
         $this->travel = $travel->diff($this->date);
 
         return $this;
